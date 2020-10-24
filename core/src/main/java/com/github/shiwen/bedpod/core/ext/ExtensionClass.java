@@ -3,8 +3,15 @@ package com.github.shiwen.bedpod.core.ext;
 import com.github.shiwen.bedpod.common.base.Sortable;
 import com.github.shiwen.bedpod.common.exception.BedpodRuntimeException;
 import com.github.shiwen.bedpod.common.utils.ClassUtils;
+import com.github.shiwen.bedpod.core.annotations.AbilityReference;
+import com.github.shiwen.bedpod.core.invoker.ProxyInvoker;
+import com.github.shiwen.bedpod.core.protocol.BedPodInjvmProtocol;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
+
+import static com.github.shiwen.bedpod.common.utils.ClassLoaderUtils.getCurrentClassLoader;
 
 /**
  * @author shiwen.wy
@@ -86,9 +93,12 @@ public class ExtensionClass<T> implements Sortable {
                             }
                         }
                     }
+                    handleAbilityReferenceField(instance);
                     return instance; // 保留单例
                 } else {
-                    return ClassUtils.newInstanceWithArgs(clazz, argTypes, args);
+                    T t = ClassUtils.newInstanceWithArgs(clazz, argTypes, args);
+                    handleAbilityReferenceField(t);
+                    return t;
                 }
             } catch (BedpodRuntimeException e) {
                 throw e;
@@ -97,6 +107,34 @@ public class ExtensionClass<T> implements Sortable {
             }
         }
         throw new BedpodRuntimeException("ERROR_EXTENSION_CLASS_NULL");
+    }
+
+    private void handleAbilityReferenceField(T instance) {
+        Class<?> targetCls = instance.getClass();
+        Field[] targetFld = targetCls.getDeclaredFields();
+        for (Field field : targetFld) {
+            //找到制定目标的注解类
+            if (field.isAnnotationPresent(AbilityReference.class)) {
+                if (!field.getType().isInterface()) {
+                    throw new BedpodRuntimeException("RoutingInjected field must be declared as an interface:" + field.getName()
+                        + " @Class " + targetCls.getName());
+                }
+                try {
+                    this.handleInjected(field, instance, field.getType());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void handleInjected(Field field, Object instance, Class<?> type) throws IllegalAccessException {
+        field.setAccessible(true);
+        AbilityReference annotation = field.getAnnotation(AbilityReference.class);
+        ProxyInvoker proxyInvoker =
+            BedPodInjvmProtocol.getInjvmProtocol().getExporterByAbilityReference(annotation, type);
+        Object proxyInstance = Proxy.newProxyInstance(getCurrentClassLoader(), new Class[] {type}, proxyInvoker);
+        field.set(instance, proxyInstance);
     }
 
     /**

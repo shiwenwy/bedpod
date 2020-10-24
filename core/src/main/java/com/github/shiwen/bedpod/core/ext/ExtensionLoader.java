@@ -31,7 +31,7 @@ public class ExtensionLoader<T> {
     /**
      * base_path
      */
-    private static final String BASE_PATH = "META-INFO/services/";
+    private static final String BASE_PATH = "META-INF/services/";
 
     /**
      * 当前加载的接口类名
@@ -111,10 +111,7 @@ public class ExtensionLoader<T> {
             ClassLoader classLoader = ClassLoaderUtils.getClassLoader(getClass());
             loadFromClassLoader(classLoader, fullFileName);
         } catch (Throwable t) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER
-                    .debug("Failed to load extension of extensible " + interfaceName + " from path:" + fullFileName, t);
-            }
+            LOGGER.error("Failed to load extension of extensible " + interfaceName + " from path:" + fullFileName, t);
         }
     }
 
@@ -126,10 +123,12 @@ public class ExtensionLoader<T> {
             while (urls.hasMoreElements()) {
                 // 读取一个文件
                 URL url = urls.nextElement();
+
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Loading extension of extensible {} from classloader: {} and file: {}", interfaceName,
                         classLoader, url);
                 }
+
                 BufferedReader reader = null;
                 try {
                     reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
@@ -152,11 +151,8 @@ public class ExtensionLoader<T> {
     }
 
     protected void readLine(URL url, String line) {
-        String[] aliasAndClassName = parseAliasAndClassName(line);
-        if (aliasAndClassName == null || aliasAndClassName.length != 2) {
-            return;
-        }
-        String className = aliasAndClassName[0];
+
+        String className = parseClassName(line);
         // 读取配置的实现类
         Class tmp;
         try {
@@ -313,7 +309,7 @@ public class ExtensionLoader<T> {
         all.put(alias, extensionClass);
     }
 
-    protected String[] parseAliasAndClassName(String line) {
+    protected String parseClassName(String line) {
         if (StringUtils.isBlank(line)) {
             return null;
         }
@@ -326,19 +322,7 @@ public class ExtensionLoader<T> {
             line = line.substring(0, i0).trim();
         }
 
-        String alias = null;
-        String className;
-        int i = line.indexOf('=');
-        if (i > 0) {
-            alias = line.substring(0, i).trim(); // 以代码里的为准
-            className = line.substring(i + 1).trim();
-        } else {
-            className = line;
-        }
-        if (className.length() == 0) {
-            return null;
-        }
-        return new String[] {alias, className};
+        return line;
     }
 
     /**

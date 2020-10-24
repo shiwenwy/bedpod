@@ -1,10 +1,13 @@
 package com.github.shiwen.bedpod.core.invoker;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 /**
  * @author shiwen.wy
  * @date 2020/10/24 4:54 下午
  */
-public class ProxyInvoker<T> {
+public class ProxyInvoker<T> implements InvocationHandler {
 
     /**
      * 能力名称
@@ -52,5 +55,10 @@ public class ProxyInvoker<T> {
 
     public void setProxy(T proxy) {
         this.proxy = proxy;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        return method.invoke(this.proxy, args);
     }
 }

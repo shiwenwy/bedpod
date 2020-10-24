@@ -27,8 +27,6 @@ public class ExtensionLoaderFactory {
      * @param <T>   Class
      *
      * @return ExtensionLoader of this class
-     *
-     * @deprecated
      */
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> clazz) {
         ExtensionLoader<T> loader = LOADER_MAP.get(clazz);

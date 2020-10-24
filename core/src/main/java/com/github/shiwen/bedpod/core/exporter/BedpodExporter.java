@@ -13,4 +13,13 @@ public class BedpodExporter implements Exporter{
     public BedpodExporter(ProxyInvoker invoker) {
         this.invoker = invoker;
     }
+
+    @Override
+    public ProxyInvoker getInvoker() {
+        return invoker;
+    }
+
+    public void setInvoker(ProxyInvoker invoker) {
+        this.invoker = invoker;
+    }
 }
