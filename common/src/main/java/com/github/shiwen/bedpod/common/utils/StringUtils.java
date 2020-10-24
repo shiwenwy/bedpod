@@ -23,6 +23,11 @@ public class StringUtils {
     public static final String   CONTEXT_SEP        = "/";
 
     /**
+     * The context path separator String {@code "."}.
+     */
+    public static final String   DOT                = ".";
+
+    /**
      * The string {@code "*"}.
      *
      * @since 5.3.1
