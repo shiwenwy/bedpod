@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -157,8 +156,7 @@ public class ExtensionLoader<T> {
         if (aliasAndClassName == null || aliasAndClassName.length != 2) {
             return;
         }
-        String alias = aliasAndClassName[0];
-        String className = aliasAndClassName[1];
+        String className = aliasAndClassName[0];
         // 读取配置的实现类
         Class tmp;
         try {
@@ -174,10 +172,10 @@ public class ExtensionLoader<T> {
             return;
         }
 
-        loadExtension(alias, tmp, StringUtils.toString(url), className);
+        loadExtension(tmp, StringUtils.toString(url), className);
     }
 
-    private void loadExtension(String alias, Class loadedClazz, String location, String className) {
+    private void loadExtension(Class loadedClazz, String location, String className) {
         if (!interfaceClass.isAssignableFrom(loadedClazz)) {
             throw new IllegalArgumentException(
                 "Error when load extension of extensible " + interfaceName + " from file:" + location + ", " + className
@@ -187,30 +185,20 @@ public class ExtensionLoader<T> {
 
         // 检查是否有可扩展标识
         Extension extension = implClass.getAnnotation(Extension.class);
+        String alias = null;
         if (extension == null) {
             throw new IllegalArgumentException(
                 "Error when load extension of extensible " + interfaceName + " from file:" + location + ", " + className
                     + " must add annotation @Extension.");
         } else {
-            String aliasInCode = extension.value();
-            if (StringUtils.isBlank(aliasInCode)) {
+            alias = extension.value();
+            if (StringUtils.isBlank(alias)) {
                 // 扩展实现类未配置@Extension 标签
                 throw new IllegalArgumentException(
                     "Error when load extension of extensible " + interfaceClass + " from file:" + location + ", "
                         + className + "'s alias of @Extension is blank");
             }
-            if (alias == null) {
-                // spi文件里没配置，用代码里的
-                alias = aliasInCode;
-            } else {
-                // spi文件里配置的和代码里的不一致
-                if (!aliasInCode.equals(alias)) {
-                    throw new IllegalArgumentException(
-                        "Error when load extension of extensible " + interfaceName + " from file:" + location
-                            + ", aliases of " + className + " are " + "not equal between " + aliasInCode + "(code) and "
-                            + alias + "(file).");
-                }
-            }
+
             // 接口需要编号，实现类没设置
             if (extensible.coded() && extension.code() < 0) {
                 throw new IllegalArgumentException(
