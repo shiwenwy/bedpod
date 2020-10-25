@@ -7,8 +7,11 @@ import com.github.shiwen.bedpod.core.exporter.BedpodExporter;
 import com.github.shiwen.bedpod.core.exporter.Exporter;
 import com.github.shiwen.bedpod.core.invoker.ProxyInvoker;
 
+import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.github.shiwen.bedpod.common.utils.ClassLoaderUtils.getCurrentClassLoader;
 
 /**
  * @author shiwen.wy
@@ -35,15 +38,32 @@ public class BedPodInjvmProtocol {
         return INSTANCE;
     }
 
+    /**
+     * 导出exporter
+     * @param invoker
+     * @return
+     */
     public Exporter export(ProxyInvoker invoker) {
         return exporterMap.putIfAbsent(getServiceKey(invoker), new BedpodExporter(invoker));
+    }
+
+    /**
+     * 获得代理
+     * @param annotation
+     * @param type
+     * @return
+     */
+    public Object refer(AbilityReference annotation, Class<?> type) {
+
+        return Proxy.newProxyInstance(getCurrentClassLoader(), new Class[]{type},
+                getExporterByAbilityReference(annotation, type));
     }
 
     private String getServiceKey(ProxyInvoker invoker) {
         return invoker.getAbilityName() + StringUtils.DOT + invoker.getInterfaceName();
     }
 
-    public ProxyInvoker getExporterByAbilityReference(AbilityReference annotation, Class<?> type) {
+    private ProxyInvoker getExporterByAbilityReference(AbilityReference annotation, Class<?> type) {
         String serviceKey = annotation.value() + StringUtils.DOT + ClassTypeUtils.getTypeStr(type);
         Exporter exporter = exporterMap.get(serviceKey);
         return exporter.getInvoker();

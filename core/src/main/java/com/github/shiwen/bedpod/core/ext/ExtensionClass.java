@@ -116,7 +116,7 @@ public class ExtensionClass<T> implements Sortable {
             //找到制定目标的注解类
             if (field.isAnnotationPresent(AbilityReference.class)) {
                 if (!field.getType().isInterface()) {
-                    throw new BedpodRuntimeException("RoutingInjected field must be declared as an interface:" + field.getName()
+                    throw new BedpodRuntimeException("AbilityReference field must be declared as an interface:" + field.getName()
                         + " @Class " + targetCls.getName());
                 }
                 try {
@@ -129,12 +129,10 @@ public class ExtensionClass<T> implements Sortable {
     }
 
     private void handleInjected(Field field, Object instance, Class<?> type) throws IllegalAccessException {
+        BedPodInjvmProtocol injvmProtocol = BedPodInjvmProtocol.getInjvmProtocol();
         field.setAccessible(true);
         AbilityReference annotation = field.getAnnotation(AbilityReference.class);
-        ProxyInvoker proxyInvoker =
-            BedPodInjvmProtocol.getInjvmProtocol().getExporterByAbilityReference(annotation, type);
-        Object proxyInstance = Proxy.newProxyInstance(getCurrentClassLoader(), new Class[] {type}, proxyInvoker);
-        field.set(instance, proxyInstance);
+        field.set(instance, injvmProtocol.refer(annotation, type));
     }
 
     /**

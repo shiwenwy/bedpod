@@ -10,6 +10,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
+ * 能力服务后处理器
  * @author shiwen.wy
  * @date 2020/10/24 3:56 下午
  */
