@@ -1,9 +1,9 @@
 package com.github.shiwen.bedpod.core.ext;
 
+import com.github.shiwen.bedpod.common.annotations.Extensible;
+import com.github.shiwen.bedpod.common.annotations.Extension;
 import com.github.shiwen.bedpod.common.exception.BedpodRuntimeException;
 import com.github.shiwen.bedpod.common.utils.*;
-import com.github.shiwen.bedpod.core.annotations.Extensible;
-import com.github.shiwen.bedpod.core.annotations.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,18 +1,21 @@
 package com.github.shiwen.bedpod.core.spring;
 
+import com.github.shiwen.bedpod.common.annotations.AbilityService;
 import com.github.shiwen.bedpod.common.utils.ClassTypeUtils;
-import com.github.shiwen.bedpod.core.annotations.AbilityService;
 import com.github.shiwen.bedpod.core.invoker.ProxyInvoker;
 import com.github.shiwen.bedpod.core.protocol.BedPodInjvmProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.stereotype.Component;
 
 /**
  * @author shiwen.wy
  * @date 2020/10/24 3:56 下午
  */
 public class AbilityServiceAnnotationBeanPostProcessor implements BeanPostProcessor {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbilityServiceAnnotationBeanPostProcessor.class);
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -21,12 +24,19 @@ public class AbilityServiceAnnotationBeanPostProcessor implements BeanPostProces
         if (abilityService == null || bean.getClass().getInterfaces().length != 1) {
             return bean;
         } else {
-            Class<?> interfaceName = bean.getClass().getInterfaces()[0];
+            try {
+                Class<?> interfaceName = bean.getClass().getInterfaces()[0];
 
-            ProxyInvoker proxyInvoker =
-                new ProxyInvoker(abilityService.value(), ClassTypeUtils.getTypeStr(interfaceName), interfaceName, bean);
+                ProxyInvoker proxyInvoker =
+                        new ProxyInvoker(abilityService.value(), ClassTypeUtils.getTypeStr(interfaceName), interfaceName, bean);
 
-            BedPodInjvmProtocol.getInjvmProtocol().export(proxyInvoker);
+                BedPodInjvmProtocol.getInjvmProtocol().export(proxyInvoker);
+            } catch (Exception e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("AbilityServiceAnnotationBeanPostProcessor error: {}", e);
+                }
+            }
+
         }
         return bean;
     }

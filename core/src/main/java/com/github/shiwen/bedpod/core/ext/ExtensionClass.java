@@ -1,9 +1,9 @@
 package com.github.shiwen.bedpod.core.ext;
 
+import com.github.shiwen.bedpod.common.annotations.AbilityReference;
 import com.github.shiwen.bedpod.common.base.Sortable;
 import com.github.shiwen.bedpod.common.exception.BedpodRuntimeException;
 import com.github.shiwen.bedpod.common.utils.ClassUtils;
-import com.github.shiwen.bedpod.core.annotations.AbilityReference;
 import com.github.shiwen.bedpod.core.invoker.ProxyInvoker;
 import com.github.shiwen.bedpod.core.protocol.BedPodInjvmProtocol;
 

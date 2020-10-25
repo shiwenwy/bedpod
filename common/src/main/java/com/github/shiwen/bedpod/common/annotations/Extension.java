@@ -1,4 +1,4 @@
-package com.github.shiwen.bedpod.core.annotations;
+package com.github.shiwen.bedpod.common.annotations;
 
 import java.lang.annotation.*;
 
