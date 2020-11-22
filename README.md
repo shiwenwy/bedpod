@@ -25,6 +25,9 @@
 每个扩展点jar包内可能使用系统的相关能力，比如缓存、数据库等等系统上的系统能力，在单个jar包内是无法使用的。所以基于以上需求，系统可以使用 
 @AbilityService 注解发布一个能力，扩展点jar包内使用 @AbilityReference 引用系统发布的功能。这样系统也可以管理所有SPI插件使用的能力。
 
+### sample
+见https://github.com/shiwenwy/sample
+
 ## 未来规划
 * 热部署
 * 能力的filter机制
